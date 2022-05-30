@@ -1,4 +1,5 @@
 class Class:
+    section_id = ""
     times = { "Monday": {"start": "00:00", "end": "00:00"}, 
              "Tuesday": {"start": "00:00", "end": "00:00"}, 
              "Wednesday": {"start": "00:00", "end": "00:00"}, 
@@ -7,9 +8,10 @@ class Class:
     timeStart = None
     timeEnd = None
     SLN = None
-    def __init__(self, times: dict, SLN: int):
+    def __init__(self, times: dict, SLN: int, section_id: str):
         self.times = times
         self.SLN = SLN
+        self.section_id = section_id
 
 def get_times(section) -> dict:
     times = { "Monday": {"start": "00:00", "end": "00:00"}, 
@@ -39,6 +41,15 @@ def ret_times(times: dict) -> str:
         ret += "Friday: " + times["Friday"]["start"] + "-" + times["Friday"]["end"] + "\n"
     return ret
 
+def found_key(section) -> bool:
+    key = ""
+    try: 
+        key = section.find_element_by_xpath(".//tr[1]/td[2]/div/div/span[3]").text[0:8]
+    except:
+        return False
+    print(key)
+    return "Add code" == key
+
 class ClassList:
     classlist = []
     name = None
@@ -47,13 +58,16 @@ class ClassList:
         self.name = name
         classlist = []
         for section in quarter:
+            if found_key(section):
+                continue
             times = get_times(section)
             SLN = section.find_element_by_xpath(".//tr[1]/td[6]").text[-5:]
-            self.classlist.append(Class(times, SLN))
+            section_id = section.find_element_by_xpath(".//tr[1]/td[2]/div/span[2]").text
+            self.classlist.append(Class(times, SLN, section_id))
 
     def to_string(self) -> str:
         class_info = ""
         for x in self.classlist:
-            class_info += self.name + ":\n" + ret_times(x.times) + "SLN: " + x.SLN + "\n\n"
+            class_info += self.name + " " + x.section_id + ":\n" + ret_times(x.times) + "SLN: " + x.SLN + "\n\n"
         return class_info
 

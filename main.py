@@ -7,7 +7,7 @@ def main():
     driver = webdriver.Chrome()
     
     URL_BASE = "https://myplan.uw.edu/course/#/courses/"
-    CLASS = "ENGL182"
+    CLASS = "PHYS121"
     QUARTER = "Autumn" # NOTE: First letter must be uppercase, the rest must be lowercase. Options: Summer, Autumn, Winter, Spring
 
     driver.get(URL_BASE + CLASS)
