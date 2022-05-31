@@ -1,6 +1,20 @@
-l = [[0, 1, 2], [3, 4, 5]]
+num = 0
 
-for i in range(len(l)):
-    for j in range(len(l[i])):
-        print(l[i][j])
-    print("\n")
+def f(l, n, curr):
+    if n == len(l):
+        global num
+        num += 1
+        print(curr)
+        return
+
+    prevcurr = curr
+    for i in range(len(l)):
+        curr += str(i+1)
+        f(l, n+1, curr)
+        curr = prevcurr
+
+
+if __name__ == "__main__":
+    l = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    f(l, 0, "")
+    print(num)
