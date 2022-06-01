@@ -1,3 +1,5 @@
+from test import is_conflict, time_to_tuple
+
 class Class(object):
     def __init__(self, times: dict, SLN: int, section_id: str):
         self.times = times
@@ -9,10 +11,11 @@ class Class(object):
 
 
 class ClassList(object):
-    def __init__(self, name, quarter, type):
+    def __init__(self, name, quarter, type, constraints):
         self.name = name
         self.type = type
         self.classlist = []
+        self.constraints = constraints
         classlist = []
         for section in quarter:
             if self.found_key(section):
@@ -23,6 +26,8 @@ class ClassList(object):
                 continue
 
             times = self.get_times(section)
+            if self.constrained(times):
+                continue
             SLN = section.find_element_by_xpath(".//tr[1]/td[6]").text[-5:]
             section_id = ""
             try:
@@ -30,6 +35,14 @@ class ClassList(object):
             except:
                 section_id = section.find_element_by_xpath(".//tr[1]/td[2]/div/div/span[2]").text
             self.classlist.append(Class(times, SLN, section_id))
+    
+    def constrained(self, times):
+        for time in times:
+            for constraint in self.constraints:
+                print(time, constraint)
+                if is_conflict(time_to_tuple(constraint), time_to_tuple(time)):
+                    return True
+        return False
 
     def found_key(self, section) -> bool:
         key = ""

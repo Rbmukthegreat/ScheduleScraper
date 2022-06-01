@@ -27,7 +27,8 @@ def search_classes(CLASS, l):
         print("This course isn't offered this quarter!")
         quit()
   
-    c = ClassList(CLASS[0], quarter, CLASS[1]) 
+    constraints = ["11:30-12:30"]
+    c = ClassList(CLASS[0], quarter, CLASS[1], constraints) 
 #    print(len(c.classlist))
 #    print(c.to_string() + "\n\n\n")
  
@@ -38,12 +39,6 @@ def search_classes(CLASS, l):
 
 def main():
     CLASSES = [("MATH334", ""), ("ENGL182", ""), ("PHYS121", "LECTURE"), ("PHYS121", "QUIZ"), ("PHYS121", "LABORATORY"), ("CSE143", "LECTURE"), ("CSE143", "QUIZ")]
-
-#    CLASSES_LIST = []
-#    for i in range(0, len(CLASSES) - 1, 2):
-#        CLASSES_LIST.append(CLASSES[i:i+2])
-#    if len(CLASSES) % 2 == 1:
-#        CLASSES_LIST.append([CLASSES[len(CLASSES) - 1]])
 
     num_processes = len(CLASSES)
     with Manager() as manager:

@@ -1,5 +1,7 @@
 import json
 from pprint import pprint
+from draw_schedule import draw_schedule
+import random
 
 count = 0
 
@@ -7,8 +9,8 @@ def sort_by(dict_object):
     return len(dict_object["ITEMS"])
 
 def print_schedule(li):
-    for CLASS, SECTION in li:
-        print(CLASS + " " + SECTION["SECTION_ID"] + " ", end="")
+    for CLASS, SECTION, TYPE in li:
+        print(CLASS + " (" + TYPE + ") " + SECTION["SECTION_ID"] + " ", end="")
     print()
 
 def time_to_tuple(time: str) -> (float, float):
@@ -25,34 +27,27 @@ def is_conflict_class(class1, class2) -> bool:
             return True
     return False
 
+all_schedules = []
 def f(l, n, curr_list):
     if n == len(l):
         global count
         count += 1
-        print_schedule(curr_list)
+        global all_schedules
+        all_schedules.append(curr_list)
         return
 
     for i in range(len(l[n]["ITEMS"])):
         temp_list = curr_list.copy()
         flag = False
-        for classname, clazz in curr_list:
+        for classname, clazz, typ in curr_list:
             if is_conflict_class(l[n]["ITEMS"][i], clazz):
                 flag = True
                 break
         if flag:
             continue
-        temp_list.append((l[n]["CLASS"], l[n]["ITEMS"][i]))
+        temp_list.append((l[n]["CLASS"], l[n]["ITEMS"][i], l[n]["TYPE"]))
         f(l, n+1, temp_list)
         temp_list = curr_list.copy()
-
-def remove_unnecessary_sections(all_sections, curr_list):
-    le = len(all_sections)
-    for i in range(len(all_sections)):
-        if len(all_sections[le - i - 1]["ITEMS"]) == 1:
-            curr_list.append((all_sections[le - i - 1]["CLASS"], all_sections[le - i - 1]["ITEMS"][0])) 
-            all_sections.pop(le - i - 1)
-        else:
-            return
 
 if __name__=="__main__":
     with open('classes.json') as json_file:
@@ -63,7 +58,6 @@ if __name__=="__main__":
                 for i in range(len(section["TIMES"])):
                         section["TIMES"][i] = time_to_tuple(section["TIMES"][i])
 
-        curr_list = []
-        remove_unnecessary_sections(all_sections, curr_list)
-        f(all_sections, 0, curr_list)
-        print(count)
+        f(all_sections, 0, [])
+        print(len(all_schedules))
+        draw_schedule(random.choice(all_schedules))
