@@ -55,31 +55,23 @@ class ClassList(object):
         return class_info
 
     def get_times(self, section) -> dict:
-        times = { "Monday": {"start": "00:00", "end": "00:00"}, 
-                 "Tuesday": {"start": "00:00", "end": "00:00"}, 
-                 "Wednesday": {"start": "00:00", "end": "00:00"}, 
-                 "Thursday": {"start": "00:00", "end": "00:00"}, 
-                 "Friday": {"start": "00:00", "end": "00:00"} }
+        times = ["00:00-00:00", "00:00-00:00", "00:00-00:00", "00:00-00:00", "00:00-00:00"]
+        day_to_num = { "Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4 }
+
         week = section.find_elements_by_xpath(".//tr[1]/td[4]/div/div")
         for x in week:
             days = x.find_element_by_xpath(".//div[1]/span").get_attribute("aria-label").split(", ")
             timez = x.find_elements_by_xpath(".//div[2]/time")
             for day in days:
-                times[day] = {"start": timez[0].get_attribute("datetime"), "end": timez[1].get_attribute("datetime")}
+                times[day_to_num[day]] = timez[0].get_attribute("datetime") + "-" + timez[1].get_attribute("datetime")
         return times
     
     def ret_times(self, times: dict) -> str:
         ret = ""
-        if times["Monday"]["start"] != "00:00":
-            ret += "Monday: " + times["Monday"]["start"] + "-" + times["Monday"]["end"] + "\n"
-        if times["Tuesday"]["start"] != "00:00":
-            ret += "Tuesday: " + times["Tuesday"]["start"] + "-" + times["Tuesday"]["end"] + "\n"
-        if times["Wednesday"]["start"] != "00:00":
-            ret += "Wednesday: " + times["Wednesday"]["start"] + "-" + times["Wednesday"]["end"] + "\n"
-        if times["Thursday"]["start"] != "00:00":
-            ret += "Thursday: " + times["Thursday"]["start"] + "-" + times["Thursday"]["end"] + "\n"
-        if times["Friday"]["start"] != "00:00":
-            ret += "Friday: " + times["Friday"]["start"] + "-" + times["Friday"]["end"] + "\n"
+        day_to_num_backwards = { 0: "Monday", 1: "Tuesday", 2: "Wednesday", 3: "Thursday", 4: "Friday"}
+        for i in range(len(times)):
+            if times[i] != "00:00-00:00":
+                ret += day_to_num_backwards[i] + ": " + times[i]
         return ret
 
     def to_dict_entry(self):
