@@ -23,7 +23,7 @@ def search_classes(CLASS, l):
         if QUARTER in quarters[i].find_element_by_xpath('.//caption').text:
             quarter = quarters[i].find_elements_by_xpath(".//tbody")
   
-    if quarter is None:
+    if quarter is None or len(quarter) == 0:
         print("This course isn't offered this quarter!")
         quit()
   
@@ -61,7 +61,7 @@ def main():
             output_list = []
             for classlist in l:
                 output_list.append(classlist.to_dict_entry())
-            json.dump(output_list, outfile)
+            json.dump(output_list, outfile, indent=4)
 
 if __name__ == "__main__":
     main()

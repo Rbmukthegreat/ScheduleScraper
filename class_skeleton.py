@@ -83,5 +83,5 @@ class ClassList(object):
         return ret
 
     def to_dict_entry(self):
-        entry = {"CLASS": self.name, "ITEMS": [ x.to_dict_entry() for x in self.classlist ] }
+        entry = {"CLASS": self.name, "TYPE": self.type, "ITEMS": [ x.to_dict_entry() for x in self.classlist ] }
         return entry
