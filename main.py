@@ -2,12 +2,13 @@ from selenium import webdriver
 from time import sleep
 from class_skeleton import ClassList
 from class_skeleton import Class
-import multiprocessing as mp
+from multiprocessing import Process, Manager
+import json
 
 URL_BASE = "https://myplan.uw.edu/course/#/courses/"
 QUARTER = "Autumn" # Summer, Autumn, Winter, Spring
 
-def search_classes(CLASS):
+def search_classes(CLASS, l):
     driver = webdriver.Chrome()
 
  #   for (CLASS, type) in CLASSES:
@@ -27,14 +28,16 @@ def search_classes(CLASS):
         quit()
   
     c = ClassList(CLASS[0], quarter, CLASS[1]) 
-    print(len(c.classlist))
-    print(c.to_string() + "\n\n\n")
+#    print(len(c.classlist))
+#    print(c.to_string() + "\n\n\n")
  
+    l.append(c)
+
     driver.close()
     return
 
 def main():
-    CLASSES = [("MATH334", ""), ("ENGL182", ""), ("PHYS121", "LECTURE"), ("PHYS121", "QUIZ"), ("PHYS121", "LABORATORY"), ("CSE143", "")]
+    CLASSES = [("MATH334", ""), ("ENGL182", ""), ("PHYS121", "LECTURE"), ("PHYS121", "QUIZ"), ("PHYS121", "LABORATORY"), ("CSE143", "LECTURE"), ("CSE143", "QUIZ")]
 
 #    CLASSES_LIST = []
 #    for i in range(0, len(CLASSES) - 1, 2):
@@ -43,11 +46,22 @@ def main():
 #        CLASSES_LIST.append([CLASSES[len(CLASSES) - 1]])
 
     num_processes = len(CLASSES)
-    mp.set_start_method("spawn")
-#    q = mp.Queue()
-    for i in range(num_processes):
-       p = mp.Process(target=search_classes, args=(CLASSES[i],)) 
-       p.start()
+    with Manager() as manager:
+        l = manager.list()
+        processes = []
+        for i in range(num_processes):
+           p = Process(target=search_classes, args=(CLASSES[i], l)) 
+           processes.append(p)
+           p.start()
+        for i in range(num_processes):
+            processes[i].join()
+        for i in range(num_processes):
+            processes[i].close()
+        with open("classes.json", "w") as outfile:
+            output_list = []
+            for classlist in l:
+                output_list.append(classlist.to_dict_entry())
+            json.dump(output_list, outfile)
 
 if __name__ == "__main__":
     main()

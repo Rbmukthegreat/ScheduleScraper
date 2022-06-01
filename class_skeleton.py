@@ -4,6 +4,8 @@ class Class(object):
         self.SLN = SLN
         self.section_id = section_id
 
+    def to_dict_entry(self) -> dict:
+        return { "SECTION_ID": self.section_id, "SLN": self.SLN, "TIMES": self.times }
 
 
 class ClassList(object):
@@ -79,3 +81,7 @@ class ClassList(object):
         if times["Friday"]["start"] != "00:00":
             ret += "Friday: " + times["Friday"]["start"] + "-" + times["Friday"]["end"] + "\n"
         return ret
+
+    def to_dict_entry(self):
+        entry = {"CLASS": self.name, "ITEMS": [ x.to_dict_entry() for x in self.classlist ] }
+        return entry
