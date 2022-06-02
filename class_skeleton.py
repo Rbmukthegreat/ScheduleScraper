@@ -39,7 +39,6 @@ class ClassList(object):
     def constrained(self, times):
         for time in times:
             for constraint in self.constraints:
-                print(time, constraint)
                 if is_conflict(time_to_tuple(constraint), time_to_tuple(time)):
                     return True
         return False
@@ -73,19 +72,24 @@ class ClassList(object):
 
         week = section.find_elements_by_xpath(".//tr[1]/td[4]/div/div")
         for x in week:
-            days = x.find_element_by_xpath(".//div[1]/span").get_attribute("aria-label").split(", ")
+            days = None
+            # this try-catch is in case it says something like "online" instead of days of the week
+            try:
+                days = x.find_element_by_xpath(".//div[1]/span").get_attribute("aria-label").split(", ")
+            except:
+                continue
             timez = x.find_elements_by_xpath(".//div[2]/time")
             for day in days:
                 times[day_to_num[day]] = timez[0].get_attribute("datetime") + "-" + timez[1].get_attribute("datetime")
         return times
     
-    def ret_times(self, times: dict) -> str:
-        ret = ""
-        day_to_num_backwards = { 0: "Monday", 1: "Tuesday", 2: "Wednesday", 3: "Thursday", 4: "Friday"}
-        for i in range(len(times)):
-            if times[i] != "00:00-00:00":
-                ret += day_to_num_backwards[i] + ": " + times[i]
-        return ret
+#    def ret_times(self, times: dict) -> str:
+#        ret = ""
+#        day_to_num_backwards = { 0: "Monday", 1: "Tuesday", 2: "Wednesday", 3: "Thursday", 4: "Friday"}
+#        for i in range(len(times)):
+#            if times[i] != "00:00-00:00":
+#                ret += day_to_num_backwards[i] + ": " + times[i]
+#        return ret
 
     def to_dict_entry(self):
         entry = {"CLASS": self.name, "TYPE": self.type, "ITEMS": [ x.to_dict_entry() for x in self.classlist ] }

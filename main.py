@@ -4,14 +4,21 @@ from class_skeleton import ClassList
 from class_skeleton import Class
 from multiprocessing import Process, Manager
 import json
+from termcolor import colored
 
 URL_BASE = "https://myplan.uw.edu/course/#/courses/"
 QUARTER = "Autumn" # Summer, Autumn, Winter, Spring
 
-def search_classes(CLASS, l):
-    driver = webdriver.Chrome()
+CLASSES = [("MATH334", ""), ("ENGL182", ""), ("PHYS121", "LECTURE"), ("PHYS121", "QUIZ"), ("PHYS121", "LABORATORY"), ("CSE143", "LECTURE"), ("CSE143", "QUIZ")]
+CONSTRAINTS = ["11:30-12:30"]
+#CONSTRAINTS = []
 
- #   for (CLASS, type) in CLASSES:
+def search_classes(CLASS, l):
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')
+    driver = webdriver.Chrome(options=options)
+
+
     driver.get(URL_BASE + CLASS[0])
  
     sleep(6)
@@ -24,22 +31,19 @@ def search_classes(CLASS, l):
             quarter = quarters[i].find_elements_by_xpath(".//tbody")
   
     if quarter is None or len(quarter) == 0:
-        print("This course isn't offered this quarter!")
-        quit()
+        print(colored("This course isn't offered this quarter!", "red"))
+        return
   
-    constraints = ["11:30-12:30"]
-    c = ClassList(CLASS[0], quarter, CLASS[1], constraints) 
-#    print(len(c.classlist))
-#    print(c.to_string() + "\n\n\n")
+    c = ClassList(CLASS[0], quarter, CLASS[1], CONSTRAINTS) 
+    if len(c.classlist) == 0:
+        print(colored("Given the constraints " + CLASS[0] + " doesn't work!", "red"))
+        return
  
     l.append(c)
 
     driver.close()
-    return
 
 def main():
-    CLASSES = [("MATH334", ""), ("ENGL182", ""), ("PHYS121", "LECTURE"), ("PHYS121", "QUIZ"), ("PHYS121", "LABORATORY"), ("CSE143", "LECTURE"), ("CSE143", "QUIZ")]
-
     num_processes = len(CLASSES)
     with Manager() as manager:
         l = manager.list()
