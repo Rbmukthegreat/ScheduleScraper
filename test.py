@@ -61,9 +61,13 @@ if __name__=="__main__":
                 for i in range(len(section["TIMES"])):
                         section["TIMES"][i] = time_to_tuple(section["TIMES"][i])
 
-        get_schedules(all_sections, 0, [])
-        print(len(all_schedules))
-        if len(all_schedules) == 0:
-            print("Oh no! There are no possibilities!")
-            quit()
-        draw_schedule(random.choice(all_schedules))
+    get_schedules(all_sections, 0, [])
+    print(len(all_schedules))
+    if len(all_schedules) == 0:
+        print("Oh no! There are no possibilities!")
+        quit()
+    choice = random.choice(all_schedules)
+    with open('classes_out.txt', 'w') as file:
+        SLNS = '\n'.join([ clazz[1]["SLN"] for clazz in choice ])
+        file.write(SLNS)
+    draw_schedule(choice)
