@@ -4,7 +4,8 @@ from draw_schedule import draw_schedule
 import random
 
 count = 0
-TIME_BETWEEN_CLASSES=0 # This number is in hours
+TIME_BETWEEN_CLASSES=0.5 # This number is in hours
+CONSTRAINTS = ["11:30-12:30"]
 
 def print_schedule(li):
     for CLASS, SECTION, TYPE in li:
@@ -18,6 +19,12 @@ def time_to_tuple(time: str) -> (float, float):
 
 def is_conflict(tup1, tup2):
     return tup1[0] < tup2[1] and tup2[0] < tup1[1]
+
+def constrained(clazz):
+    for st in CONSTRAINTS:
+        if is_conflict(clazz, time_to_tuple(st)):
+            return True
+    return False
 
 def is_conflict_class(class1, class2) -> bool:
     for i in range(5):

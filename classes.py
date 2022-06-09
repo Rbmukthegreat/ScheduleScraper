@@ -11,11 +11,10 @@ class Class(object):
 
 
 class ClassList(object):
-    def __init__(self, name, quarter, type, constraints):
+    def __init__(self, name, quarter, type):
         self.name = name
         self.type = type
         self.classlist = []
-        self.constraints = constraints
         classlist = []
         for section in quarter:
             if self.found_key(section):
@@ -26,8 +25,6 @@ class ClassList(object):
                 continue
 
             times = self.get_times(section)
-            if self.constrained(times):
-                continue
             SLN = section.find_element_by_xpath(".//tr[1]/td[6]").text[-5:]
             section_id = ""
             try:
@@ -35,13 +32,6 @@ class ClassList(object):
             except:
                 section_id = section.find_element_by_xpath(".//tr[1]/td[2]/div/div/span[2]").text
             self.classlist.append(Class(times, SLN, section_id))
-    
-    def constrained(self, times):
-        for time in times:
-            for constraint in self.constraints:
-                if is_conflict(time_to_tuple(constraint), time_to_tuple(time)):
-                    return True
-        return False
 
     def found_key(self, section) -> bool:
         key = ""
@@ -82,14 +72,6 @@ class ClassList(object):
             for day in days:
                 times[day_to_num[day]] = timez[0].get_attribute("datetime") + "-" + timez[1].get_attribute("datetime")
         return times
-    
-#    def ret_times(self, times: dict) -> str:
-#        ret = ""
-#        day_to_num_backwards = { 0: "Monday", 1: "Tuesday", 2: "Wednesday", 3: "Thursday", 4: "Friday"}
-#        for i in range(len(times)):
-#            if times[i] != "00:00-00:00":
-#                ret += day_to_num_backwards[i] + ": " + times[i]
-#        return ret
 
     def to_dict_entry(self):
         entry = {"CLASS": self.name, "TYPE": self.type, "ITEMS": [ x.to_dict_entry() for x in self.classlist ] }

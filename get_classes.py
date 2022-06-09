@@ -10,14 +10,12 @@ URL_BASE = "https://myplan.uw.edu/course/#/courses/"
 QUARTER = "Autumn" # Summer, Autumn, Winter, Spring
 
 CLASSES = [("MATH334", ""), ("ENGL182", ""), ("PHYS121", "LECTURE"), ("PHYS121", "QUIZ"), ("PHYS121", "LABORATORY"), ("CSE143", "LECTURE"), ("CSE143", "QUIZ")]
-CONSTRAINTS = ["11:30-12:30"]
-#CONSTRAINTS = []
+#CLASSES=[("MATH207", ""), ("MATH208", ""), ("MATH126", ""), ("PHYS121", "LECTURE"), ("PHYS121", "QUIZ"), ("PHYS121", "LABORATORY")]
 
 def search_classes(CLASS, l):
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
     driver = webdriver.Chrome(options=options)
-
 
     driver.get(URL_BASE + CLASS[0])
  
@@ -31,12 +29,12 @@ def search_classes(CLASS, l):
             quarter = quarters[i].find_elements_by_xpath(".//tbody")
   
     if quarter is None or len(quarter) == 0:
-        print(colored("This course isn't offered this quarter!", "red"))
+        print(colored(CLASS[0] + " " + CLASS[1] + " course isn't offered this quarter!", "red"))
         return
   
-    c = ClassList(CLASS[0], quarter, CLASS[1], CONSTRAINTS) 
+    c = ClassList(CLASS[0], quarter, CLASS[1]) 
     if len(c.classlist) == 0:
-        print(colored("Given the constraints " + CLASS[0] + " doesn't work!", "red"))
+        print(colored("Given the constraints " + CLASS[0] + " " + CLASS[1] + " doesn't work!", "red"))
         return
  
     l.append(c)
