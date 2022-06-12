@@ -1,5 +1,3 @@
-from test import is_conflict, time_to_tuple
-
 class Class(object):
     def __init__(self, times: dict, SLN: int, section_id: str):
         self.times = times
