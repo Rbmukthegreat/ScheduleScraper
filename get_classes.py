@@ -1,7 +1,6 @@
 from selenium import webdriver
 from time import sleep
-from class_skeleton import ClassList
-from class_skeleton import Class
+from classes import ClassList, Class
 from multiprocessing import Process, Manager
 import json
 from termcolor import colored

@@ -4,8 +4,8 @@ from draw_schedule import draw_schedule
 import random
 
 count = 0
-TIME_BETWEEN_CLASSES=0.5 # This number is in hours
-CONSTRAINTS = ["11:30-12:30"]
+TIME_BETWEEN_CLASSES=0 # This number is in hours
+CONSTRAINTS = []
 
 def print_schedule(li):
     for CLASS, SECTION, TYPE in li:
@@ -22,8 +22,9 @@ def is_conflict(tup1, tup2):
 
 def constrained(clazz):
     for st in CONSTRAINTS:
-        if is_conflict(clazz, time_to_tuple(st)):
-            return True
+        for i in range(5):
+            if is_conflict(clazz["TIMES"][i], time_to_tuple(st)):
+                return True
     return False
 
 def is_conflict_class(class1, class2) -> bool:
@@ -54,13 +55,18 @@ def get_schedules(l, n, curr_list):
             if is_conflict_class(l[n]["ITEMS"][i], clazz):
                 flag = True
                 break
+            if constrained((l[n]["ITEMS"][i])):
+                flag = True
+                break
         if flag:
             continue
         temp_list.append((l[n]["CLASS"], l[n]["ITEMS"][i], l[n]["TYPE"]))
         get_schedules(l, n+1, temp_list)
         temp_list = curr_list.copy()
 
-if __name__=="__main__":
+def main(CONSTRAINTZ):
+    global CONSTRAINTS
+    CONSTRAINTS = CONSTRAINTZ
     with open('classes.json') as json_file:
         all_sections = json.load(json_file)
         for classes in all_sections:
@@ -68,9 +74,15 @@ if __name__=="__main__":
                 for i in range(len(section["TIMES"])):
                         section["TIMES"][i] = time_to_tuple(section["TIMES"][i])
 
-        get_schedules(all_sections, 0, [])
-        print(len(all_schedules))
-        if len(all_schedules) == 0:
-            print("Oh no! There are no possibilities!")
-            quit()
-        draw_schedule(random.choice(all_schedules))
+    get_schedules(all_sections, 0, [])
+    print(len(all_schedules))
+    if len(all_schedules) == 0:
+        print("Oh no! There are no possibilities!")
+        quit()
+    choice = random.choice(all_schedules)
+    with open('classes_out.txt', 'w') as file:
+        SLNS = '\n'.join([ clazz[1]["SLN"] for clazz in choice ])
+        file.write(SLNS)
+    draw_schedule(choice)
+
+main(["11:30-12:30"])
