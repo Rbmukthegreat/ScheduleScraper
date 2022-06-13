@@ -1,10 +1,1 @@
-idea for constraints:
-add a LUNCH_ENCLOSURES string that would look like this: "10:30-12:30" that would specify when lunch COULD be
-add a LEN_LUNCH float that would specify how long lunch would be (in hours)
-to check that this is correct:
-  add ALL schedules to the list
-  after doing so, get all classes that would overlap with LUNCH_ENCLOSURES
-  finally, check the time between those classes--something like secondclass_start - firstclass_end, and see if it is >= len_lunch
-  if so, either continue, but if at last day (friday) add to the list of possible schedules
-  
-do this instead of setting lunch to be at a certain time everyday--because that might sink the possibilities down to 0 on the day that it matters.
+TODO: obviously sort classe_in_lunchtime and then rethink the time between them process
