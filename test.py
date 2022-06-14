@@ -11,7 +11,7 @@ def time_to_tuple(time: str) -> (float, float):
 count = 0
 TIME_BETWEEN_CLASSES=0 # This number is in hours
 CONSTRAINTS = ["18:30-23:59", "08:30-09:30"]
-LUNCH = time_to_tuple("11:00-13:00")
+LUNCH = time_to_tuple("10:30-13:30")
 LEN_LUNCH = 40.0/60
 
 def print_schedule(li):
@@ -65,48 +65,28 @@ def get_schedules(l, n, curr_list):
         get_schedules(l, n+1, temp_list)
         temp_list = curr_list.copy()
 
+def key(e):
+    return e[1]
+
 def lunch_check(schedule):
     num_to_day = { 0: "Monday", 1: "Tuesday", 2: "Wednesday", 3: "Thursday", 4: "Friday" }
     for i in range(5):
-        #print(num_to_day[i] + ":\n")
         classes_in_lunchtime = []
         for classname, clazz, typ in schedule:
-            if is_conflict(clazz["TIMES"][i], LUNCH):
-                classes_in_lunchtime.append(clazz["TIMES"][i])
-                #print(classname + " " + typ + "\n")
-        #print("length of classes in lunchtime: " + str(len(classes_in_lunchtime)) + "\n")
-        if len(classes_in_lunchtime) == 0:
+                if is_conflict(clazz["TIMES"][i], LUNCH):
+                    classes_in_lunchtime.append(clazz["TIMES"][i])
+        classes_in_lunchtime.sort(key=key)
+        before_lunch = classes_in_lunchtime[0][0] - LUNCH[0]
+        after_lunch = LUNCH[1] - classes_in_lunchtime[len(classes_in_lunchtime) - 1][1]
+        if after_lunch >= LEN_LUNCH or before_lunch >= LEN_LUNCH:
             continue
-        elif len(classes_in_lunchtime) == 1:
-            lunch_before = classes_in_lunchtime[0][0] - LUNCH[0]
-            lunch_after = LUNCH[1] - classes_in_lunchtime[0][1]
-            if lunch_before >= LEN_LUNCH or lunch_after >= LEN_LUNCH:
-                continue
-            else:
-                return False
-        else:
-            lunch_before = min([ clazz_start[0] - LUNCH[0] for clazz_start in classes_in_lunchtime ])
-            lunch_after = min([ LUNCH[1] - clazz_end[1] for clazz_end in classes_in_lunchtime ])
-            #print("lunch before: " + str(lunch_before) + " lunch after: " + str(lunch_after))
-            if lunch_before >= LEN_LUNCH or lunch_after >= LEN_LUNCH:
-                continue
-            times_between = []
-            for j in range(len(classes_in_lunchtime)):
-                time_min_between = 100000000000
-                for k in range(len(classes_in_lunchtime)):
-                    if k == j:
-                        continue
-                    # this removes the negative option
-                    time_between = max(classes_in_lunchtime[k][0] - classes_in_lunchtime[j][1], classes_in_lunchtime[j][0] - classes_in_lunchtime[k][1])
-                    time_min_between = min(time_min_between, time_between)
-                #print("time min between: " + str(time_min_between) + "\n")
-                times_between.append(time_min_between)
-            #print("times_between: " + str(times_between) + "\n")
-            #print("max of times between: " + str(max(times_between)))
-            if len(times_between) == 0 or not max(times_between) >= LEN_LUNCH:
-                return False
+        times_between = []
+        for i in range(len(classes_in_lunchtime) - 1):
+             times_between.append(classes_in_lunchtime[i+1][0] - classes_in_lunchtime[i][1])
+        if len(times_between) == 0 or not max(times_between) >= LEN_LUNCH:
+            return False
     return True
-
+    
 def main():
     with open('classes.json') as json_file:
         all_sections = json.load(json_file)
