@@ -9,15 +9,15 @@ def time_to_tuple(time: str) -> (float, float):
     return (first, second)
 
 count = 0
-TIME_BETWEEN_CLASSES=0 # This number is in hours
+TIME_BETWEEN_CLASSES=10.0/60 # This number is in hours
 CONSTRAINTS = ["18:30-23:59", "08:30-09:30"]
 LUNCH = time_to_tuple("10:30-13:30")
 LEN_LUNCH = 40.0/60
 
-def print_schedule(li):
-    for CLASS, SECTION, TYPE in li:
-        print(CLASS + " (" + TYPE + ") " + SECTION["SECTION_ID"] + " ", end="")
-    print()
+#def print_schedule(li):
+#    for CLASS, SECTION, TYPE in li:
+#        print(CLASS + " (" + TYPE + ") " + SECTION["SECTION_ID"] + " ", end="")
+#    print()
 
 def is_conflict(tup1, tup2):
     return tup1[0] < tup2[1] and tup2[0] < tup1[1]
@@ -76,6 +76,8 @@ def lunch_check(schedule):
                 if is_conflict(clazz["TIMES"][i], LUNCH):
                     classes_in_lunchtime.append(clazz["TIMES"][i])
         classes_in_lunchtime.sort(key=key)
+        if len(classes_in_lunchtime) == 0:
+            continue
         before_lunch = classes_in_lunchtime[0][0] - LUNCH[0]
         after_lunch = LUNCH[1] - classes_in_lunchtime[len(classes_in_lunchtime) - 1][1]
         if after_lunch >= LEN_LUNCH or before_lunch >= LEN_LUNCH:
@@ -97,15 +99,12 @@ def main():
 
     get_schedules(all_sections, 0, [])
     correct_schedules = [ schedule for schedule in all_schedules if lunch_check(schedule) ]
-    print(len(all_schedules))
-    print("len of correct schedules: " + str(len(correct_schedules)))
-    if len(all_schedules) == 0:
-        print("Oh no! There are no possibilities!")
+    print("Number of correct schedules: " + str(len(correct_schedules)))
+    if len(correct_schedules) == 0:
+        print("No possibilities!")
         quit()
     choice = random.choice(correct_schedules)
     draw_schedule(choice)
-    print("\n\n\n\n\n\n\n\n")
-    print(lunch_check(choice))
     with open('classes_out.txt', 'w') as file:
         SLNS = '\n'.join([ clazz[1]["SLN"] for clazz in choice ])
         file.write(SLNS)
