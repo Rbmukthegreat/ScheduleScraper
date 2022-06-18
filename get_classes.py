@@ -9,7 +9,7 @@ from termcolor import colored
 URL_BASE = "https://myplan.uw.edu/course/#/courses/"
 QUARTER = "Autumn" # Summer, Autumn, Winter, Spring
 
-CLASSES = [("MATH334", ""), ("ENGL182", ""), ("PHYS121", "LECTURE"), ("PHYS121", "QUIZ"), ("PHYS121", "LABORATORY"), ("CSE143", "LECTURE"), ("CSE143", "QUIZ")]
+CLASSES = [("MATH334", ""),  ("PHYS121", "LECTURE"), ("PHYS121", "QUIZ"), ("PHYS121", "LABORATORY"), ("CSE143", "LECTURE"), ("CSE143", "QUIZ")]
 
 def search_classes(CLASS, l):
     options = webdriver.ChromeOptions()

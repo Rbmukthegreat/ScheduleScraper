@@ -2,7 +2,7 @@ import json
 from pprint import pprint
 from draw_schedule import draw_schedule
 import random
-from os import rmdir, mkdir
+import os
 
 def time_to_tuple(time: str) -> (float, float):
     first = float(time[0:2]) + float(time[3:5])/60
@@ -10,16 +10,16 @@ def time_to_tuple(time: str) -> (float, float):
     return (first, second)
 
 count = 0
-TIME_BETWEEN_CLASSES=20.0/60 # This number is in hours
-CONSTRAINTS = ["18:30-23:59"]
-LUNCH = time_to_tuple("11:00-13:30")
+TIME_BETWEEN_CLASSES=10.0/60 # This number is in hours
+CONSTRAINTS = ["18:30-23:59", "08:30-09:30"]
+LUNCH = time_to_tuple("11:00-13:00")
 LEN_LUNCH = 40.0/60
 SORT_BY=(("PHYS121", "QUIZ", True), ("PHYS121", "LAB", False), ("PHYS121", "", False)) # True = Earlier, False = Later
 
-#def print_schedule(li):
-#    for CLASS, SECTION, TYPE in li:
-#        print(CLASS + " (" + TYPE + ") " + SECTION["SECTION_ID"] + " ", end="")
-#    print()
+def print_schedule(li):
+    for CLASS, SECTION, TYPE in li:
+        print(CLASS + " (" + TYPE + ") " + SECTION["SECTION_ID"] + " ", end="")
+    print()
 
 def is_conflict(tup1, tup2):
     return tup1[0] < tup2[1] and tup2[0] < tup1[1]
@@ -95,7 +95,7 @@ def direction(boolean):
     if boolean == True:
         return 1
     else:
-        return -1
+        return -0.5
 
 def key_to_sort_schedules(schedule):
     number = 0
@@ -124,8 +124,11 @@ def main():
         quit()
     correct_schedules.sort(key=key_to_sort_schedules)
     all_SLNs = ""
-#    rmdir("images_of_schedules")
-#    mkdir("images_of_schedules") # TODO: remove all files
+    if os.path.isdir("images_of_schedules"):
+        for image in os.listdir("images_of_schedules"):
+            os.remove(os.path.join("images_of_schedules/", image))
+    else:
+      os.mkdir("images_of_schedules")
     for i in range(min(len(correct_schedules), 50)):
        draw_schedule(correct_schedules[i], i + 1)
        SLNs = '\n'.join([ clazz[0] + " " + clazz[2] + ": " + clazz[1]["SLN"] for clazz in correct_schedules[i] ])

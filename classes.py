@@ -1,4 +1,4 @@
-from selenium.webdriver.common import By
+from selenium.webdriver.common.by import By
 
 class Class(object):
     def __init__(self, times: dict, SLN: int, section_id: str):
