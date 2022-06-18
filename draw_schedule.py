@@ -20,7 +20,7 @@ def draw_class(classname, typ, times, img1, fnt, n):
         img1.rectangle(shape, fill=colors[n], outline="black")
         img1.multiline_text((DISTANCE_BETWEEN_DAYS*i+300, get_height(start, end, typ)), classname+"\n"+typ, font=fnt, fill=(0, 0, 0, 128))
 
-def draw_schedule(classes):
+def draw_schedule(classes, number):
     w, h, = 1920, 1080
     img = Image.new("RGB", (w, h), (255, 255, 255, 128))
     
@@ -37,4 +37,6 @@ def draw_schedule(classes):
     for i in range(len(classes)):
         draw_class(classes[i][0], classes[i][2], classes[i][1]["TIMES"], img1, fnt, i) 
 
-    img.show()
+    if number == 0:
+        img.show()
+    img.save("images_of_schedules/schedule_" + str(number) + ".png")

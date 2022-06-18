@@ -2,6 +2,7 @@ import json
 from pprint import pprint
 from draw_schedule import draw_schedule
 import random
+from os import rmdir, mkdir
 
 def time_to_tuple(time: str) -> (float, float):
     first = float(time[0:2]) + float(time[3:5])/60
@@ -9,10 +10,11 @@ def time_to_tuple(time: str) -> (float, float):
     return (first, second)
 
 count = 0
-TIME_BETWEEN_CLASSES=10.0/60 # This number is in hours
-CONSTRAINTS = ["18:30-23:59", "08:30-09:30"]
-LUNCH = time_to_tuple("10:30-13:30")
+TIME_BETWEEN_CLASSES=20.0/60 # This number is in hours
+CONSTRAINTS = ["18:30-23:59"]
+LUNCH = time_to_tuple("11:00-13:30")
 LEN_LUNCH = 40.0/60
+SORT_BY=(("PHYS121", "QUIZ", True), ("PHYS121", "LAB", False), ("PHYS121", "", False)) # True = Earlier, False = Later
 
 #def print_schedule(li):
 #    for CLASS, SECTION, TYPE in li:
@@ -65,7 +67,7 @@ def get_schedules(l, n, curr_list):
         get_schedules(l, n+1, temp_list)
         temp_list = curr_list.copy()
 
-def key(e):
+def key_to_sort_classes_in_lunchtime(e):
     return e[1]
 
 def lunch_check(schedule):
@@ -75,7 +77,7 @@ def lunch_check(schedule):
         for classname, clazz, typ in schedule:
                 if is_conflict(clazz["TIMES"][i], LUNCH):
                     classes_in_lunchtime.append(clazz["TIMES"][i])
-        classes_in_lunchtime.sort(key=key)
+        classes_in_lunchtime.sort(key=key_to_sort_classes_in_lunchtime)
         if len(classes_in_lunchtime) == 0:
             continue
         before_lunch = classes_in_lunchtime[0][0] - LUNCH[0]
@@ -88,6 +90,22 @@ def lunch_check(schedule):
         if len(times_between) == 0 or not max(times_between) >= LEN_LUNCH:
             return False
     return True
+
+def direction(boolean):
+    if boolean == True:
+        return 1
+    else:
+        return -1
+
+def key_to_sort_schedules(schedule):
+    number = 0
+    for CLAZZNAME, CLAZZTYP, by_early in SORT_BY:
+        for CLASSNAME, CLASSINFO, TYP in schedule:
+            if CLAZZNAME != CLASSNAME or CLAZZTYP != TYP:
+                continue
+            for i in range(5):
+                number += CLASSINFO["TIMES"][i][0]*direction(by_early)
+    return number
     
 def main():
     with open('classes.json') as json_file:
@@ -98,15 +116,21 @@ def main():
                         section["TIMES"][i] = time_to_tuple(section["TIMES"][i])
 
     get_schedules(all_sections, 0, [])
+    global all_schedules
     correct_schedules = [ schedule for schedule in all_schedules if lunch_check(schedule) ]
     print("Number of correct schedules: " + str(len(correct_schedules)))
     if len(correct_schedules) == 0:
         print("No possibilities!")
         quit()
-    choice = random.choice(correct_schedules)
-    draw_schedule(choice)
-    with open('classes_out.txt', 'w') as file:
-        SLNS = '\n'.join([ clazz[1]["SLN"] for clazz in choice ])
-        file.write(SLNS)
-
+    correct_schedules.sort(key=key_to_sort_schedules)
+    all_SLNs = ""
+#    rmdir("images_of_schedules")
+#    mkdir("images_of_schedules") # TODO: remove all files
+    for i in range(min(len(correct_schedules), 50)):
+       draw_schedule(correct_schedules[i], i + 1)
+       SLNs = '\n'.join([ clazz[0] + " " + clazz[2] + ": " + clazz[1]["SLN"] for clazz in correct_schedules[i] ])
+       all_SLNs += "#" + str(i+1) + ":\n\n" + SLNs + "\n\n"
+ 
+    with open('SLNs.txt', 'w') as file:
+        file.write(all_SLNs)
 main()

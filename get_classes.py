@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from time import sleep
 from classes import ClassList, Class
 from multiprocessing import Process, Manager
@@ -9,7 +10,6 @@ URL_BASE = "https://myplan.uw.edu/course/#/courses/"
 QUARTER = "Autumn" # Summer, Autumn, Winter, Spring
 
 CLASSES = [("MATH334", ""), ("ENGL182", ""), ("PHYS121", "LECTURE"), ("PHYS121", "QUIZ"), ("PHYS121", "LABORATORY"), ("CSE143", "LECTURE"), ("CSE143", "QUIZ")]
-#CLASSES=[("MATH207", ""), ("MATH208", ""), ("MATH126", ""), ("PHYS121", "LECTURE"), ("PHYS121", "QUIZ"), ("PHYS121", "LABORATORY")]
 
 def search_classes(CLASS, l):
     options = webdriver.ChromeOptions()
@@ -20,12 +20,12 @@ def search_classes(CLASS, l):
  
     sleep(6)
   
-    quarters = driver.find_elements_by_xpath("//*[@class=\"mb-0 table table-borderless\"]")
+    quarters = driver.find_elements(by=By.XPATH, value="//*[@class=\"mb-0 table table-borderless\"]")
     
     quarter = None
     for i in range(len(quarters)):
-        if QUARTER in quarters[i].find_element_by_xpath('.//caption').text:
-            quarter = quarters[i].find_elements_by_xpath(".//tbody")
+        if QUARTER in quarters[i].find_element(by=By.XPATH, value='.//caption').text:
+            quarter = quarters[i].find_elements(by=By.XPATH, value=".//tbody")
   
     if quarter is None or len(quarter) == 0:
         print(colored(CLASS[0] + " " + CLASS[1] + " course isn't offered this quarter!", "red"))

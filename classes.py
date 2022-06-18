@@ -1,3 +1,5 @@
+from selenium.webdriver.common import By
+
 class Class(object):
     def __init__(self, times: dict, SLN: int, section_id: str):
         self.times = times
@@ -23,29 +25,29 @@ class ClassList(object):
                 continue
 
             times = self.get_times(section)
-            SLN = section.find_element_by_xpath(".//tr[1]/td[6]").text[-5:]
+            SLN = section.find_element(by=By.XPATH, value=".//tr[1]/td[6]").text[-5:]
             section_id = ""
             try:
-                section_id = section.find_element_by_xpath(".//tr[1]/td[2]/div/span[2]").text
+                section_id = section.find_element(by=By.XPATH, value=".//tr[1]/td[2]/div/span[2]").text
             except:
-                section_id = section.find_element_by_xpath(".//tr[1]/td[2]/div/div/span[2]").text
+                section_id = section.find_element(by=By.XPATH, value=".//tr[1]/td[2]/div/div/span[2]").text
             self.classlist.append(Class(times, SLN, section_id))
 
     def found_key(self, section) -> bool:
         key = ""
         try: 
-            key = section.find_element_by_xpath(".//tr[1]/td[2]/div/div/span[3]").text[0:8]
+            key = section.find_element(by=By.XPATH, value=".//tr[1]/td[2]/div/div/span[3]").text[0:8]
         except:
             return False
         return ("Add code" == key)
     
     def class_full(self, section) -> bool:
-       return [ int(s) for s in section.find_element_by_xpath(".//tr[1]/td[7]/small").text.split() if s.isdigit() ][0] <= 0
+       return [ int(s) for s in section.find_element(by=By.XPATH, value=".//tr[1]/td[7]/small").text.split() if s.isdigit() ][0] <= 0
 
     def right_type(self, section) -> bool:
        if self.type == "":
            return True 
-       thistype = section.find_element_by_xpath(".//tr[1]/td[3]/span").text.split(" ")[0].upper() 
+       thistype = section.find_element(by=By.XPATH, value=".//tr[1]/td[3]/span").text.split(" ")[0].upper() 
        return (thistype==self.type)
 
     def to_string(self) -> str:
@@ -58,15 +60,15 @@ class ClassList(object):
         times = ["00:00-00:00", "00:00-00:00", "00:00-00:00", "00:00-00:00", "00:00-00:00"]
         day_to_num = { "Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3, "Friday": 4 }
 
-        week = section.find_elements_by_xpath(".//tr[1]/td[4]/div/div")
+        week = section.find_elements(by=By.XPATH, value=".//tr[1]/td[4]/div/div")
         for x in week:
             days = None
             # this try-catch is in case it says something like "online" instead of days of the week
             try:
-                days = x.find_element_by_xpath(".//div[1]/span").get_attribute("aria-label").split(", ")
+                days = x.find_element(by=By.XPATH, value=".//div[1]/span").get_attribute("aria-label").split(", ")
             except:
                 continue
-            timez = x.find_elements_by_xpath(".//div[2]/time")
+            timez = x.find_elements(by=By.XPATH, value=".//div[2]/time")
             for day in days:
                 times[day_to_num[day]] = timez[0].get_attribute("datetime") + "-" + timez[1].get_attribute("datetime")
         return times
